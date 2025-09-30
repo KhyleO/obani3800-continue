@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(Mywidget1());
+}
+
+class Mywidget1 extends StatefulWidget {
+  @override
+  _Mywidget1State createState() => _Mywidget1State();
+}
+
+class _Mywidget1State extends State<Mywidget1> {
+  final Account account1 = Account("12345", "John Doe", 1000.0, 0.05);
+  final Account account2 = Account("13579", "Mary Doe", 2000.0, 0.10);
+
+  TextEditingController accountNumCtrl1 = TextEditingController();
+  TextEditingController accountNameCtrl1 = TextEditingController();
+  TextEditingController balanceCtrl1 = TextEditingController();
+  TextEditingController interestRateCtrl1 = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.yellow,
+          title: Text("Interest Calculator"),
+        ),
+        body: Builder(builder: (context) {
+          return Center(
+            child: SingleChildScrollView( // Prevent overflow on smaller screens
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    account1.displayAccountDetails(),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                  SizedBox(height: 30),
+
+                  // TextFields now use controllers
+                  TextField(
+                    controller: accountNumCtrl1,
+                    decoration: InputDecoration(labelText: "Account Number:"),
+                  ),
+                  TextField(
+                    controller: accountNameCtrl1,
+                    decoration: InputDecoration(labelText: "Account Name:"),
+                  ),
+                  TextField(
+                    controller: balanceCtrl1,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: "Balance:"),
+                  ),
+                  TextField(
+                    controller: interestRateCtrl1,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(labelText: "Interest:"),
+                  ),
+                  SizedBox(height: 40),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        if (accountNumCtrl1.text.isNotEmpty &&
+                            accountNameCtrl1.text.isNotEmpty &&
+                            balanceCtrl1.text.isNotEmpty &&
+                            interestRateCtrl1.text.isNotEmpty) {
+                          account1.accNum = accountNumCtrl1.text;
+                          account1.accName = accountNameCtrl1.text;
+                          account1.balance = double.parse(balanceCtrl1.text);
+                          account1.interestRate =
+                              double.parse(interestRateCtrl1.text);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Please fill in all fields")),
+                          );
+                        }
+                      });
+                    },
+                    child: Text("Update Account"),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.yellow),
+                      foregroundColor: MaterialStateProperty.all(Colors.black),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class Account {
+  String accNum;
+  String accName;
+  double balance;
+  double interestRate;
+
+  Account(this.accNum, this.accName, this.balance, this.interestRate);
+
+  String displayAccountDetails() {
+    return "Account Number: $accNum \nAccount Name: $accName \nBalance: ₱ $balance \nInterest: $interestRate \nInterest Earnings: ₱ ${calculateInterestEarnings()}";
+  }
+
+  double calculateInterestEarnings() {
+    return balance * interestRate;
+  }
+}
